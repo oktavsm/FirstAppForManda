@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "912996563648",
+    "project_id": "firstappformanda",
+    "storage_bucket": "firstappformanda.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:912996563648:android:3cfa864bcbc77a9e480b25",
+        "android_client_info": {
+          "package_name": "com.example.firstappformanda"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBbbP9ECTRb__yZ9oV01kbdkw8kP1cigII"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
