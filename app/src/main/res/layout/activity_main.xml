@@ -15,20 +15,37 @@
         android:layout_centerInParent="true"
         android:gravity="center"
         android:visibility="gone"
-        tools:visibility="visible"> <TextView
-        android:id="@+id/tv_welcome_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Selamat Datang!"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="24dp"/>
+        tools:visibility="visible">
+
+        <TextView
+            android:id="@+id/tv_welcome_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Selamat Datang!"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="24dp"/>
+
+        <Button
+            android:id="@+id/btn_to_todo"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="Lihat Tugas"
+            android:layout_marginBottom="8dp"/>
+
+        <Button
+            android:id="@+id/btn_to_couple"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="Hubungkan Pasangan"
+            android:layout_marginBottom="8dp"/>
 
         <Button
             android:id="@+id/btn_logout"
-            android:layout_width="wrap_content"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:text="Logout"/>
+
 
     </LinearLayout>
 
@@ -39,12 +56,14 @@
         android:orientation="vertical"
         android:layout_centerInParent="true"
         android:gravity="center"
-        android:visibility="visible"> <Button
-        android:id="@+id/btn_to_login"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:text="Login"
-        android:layout_marginBottom="16dp"/>
+        android:visibility="visible">
+
+        <Button
+            android:id="@+id/btn_to_login"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="Login"
+            android:layout_marginBottom="16dp"/>
 
         <Button
             android:id="@+id/btn_to_register"

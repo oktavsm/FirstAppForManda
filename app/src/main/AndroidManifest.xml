@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FirstAppForManda">
         <activity
+            android:name=".CoupleActivity"
+            android:exported="false" />
+        <activity
             android:name=".TodoActivity"
             android:exported="false" />
         <activity
