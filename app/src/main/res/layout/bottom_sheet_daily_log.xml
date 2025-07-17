@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:id="@+id/tv_selected_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Catatan untuk 9 Juli 2025"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="24dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bagaimana mood-mu?"
+        android:textStyle="bold"/>
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chip_group_moods"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:singleSelection="true"> <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Choice" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="😄 Gembira"/>
+        <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Choice" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="😊 Biasa Saja"/>
+        <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Choice" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="😔 Sedih"/>
+        <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Choice" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="😡 Marah"/>
+        <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Choice" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="😴 Lelah"/>
+
+    </com.google.android.material.chip.ChipGroup>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Gejala yang dirasakan?"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"/>
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chip_group_symptoms"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Kram Perut"/>
+        <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Sakit Kepala"/>
+        <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Jerawat"/>
+        <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Nyeri Punggung"/>
+        <com.google.android.material.chip.Chip style="@style/Widget.MaterialComponents.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Mual"/>
+
+    </com.google.android.material.chip.ChipGroup>
+
+    <EditText
+        android:id="@+id/et_daily_notes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tulis catatan tambahan di sini..."
+        android:lines="3"
+        android:gravity="top"
+        android:layout_marginTop="16dp"/>
+
+    <!-- (BARU) Tombol Hapus, awalnya disembunyikan -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_delete_daily_log"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hapus Catatan Ini"
+        android:textColor="@android:color/holo_red_dark"
+        android:layout_gravity="end"
+        android:visibility="gone" />
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_save_daily_log"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Simpan Catatan Harian"
+        android:layout_marginTop="24dp"/>
+
+</LinearLayout>

@@ -1,0 +1,20 @@
+<svg width="200" height="200" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background circle for a cute, soft look -->
+    <circle cx="12" cy="12" r="11" fill="#F48FB1"/>
+
+    <!-- Main calendar/event shape -->
+    <rect x="6" y="7" width="12" height="10" rx="2" fill="#FFFFFF"/>
+
+    <!-- Top part of the calendar (header) -->
+    <rect x="6" y="5" width="12" height="3" rx="1.5" fill="#E0BBE4"/>
+
+    <!-- Small details for a cute effect, like a heart or a star -->
+    <!-- Here's a simple heart, typical for cute designs -->
+    <path d="M12 15.5L11.2929 14.7929C9.72515 13.2252 8 11.8333 8 10C8 8.34315 9.34315 7 11 7C11.732 7 12.433 7.31179 12.9239 7.80269L12 8.7267L11.0761 7.80269C11.567 7.31179 12.268 7 13 7C14.6569 7 16 8.34315 16 10C16 11.8333 14.2748 13.2252 12.7071 14.7929L12 15.5Z" fill="#F48FB1"/>
+
+    <!-- Optional: A tiny dot inside the heart for extra cuteness -->
+    <circle cx="12" cy="11.5" r="0.5" fill="#FFFFFF"/>
+
+    <!-- Shadow/depth effect for the main shape (optional, but adds dimension) -->
+    <rect x="6.5" y="7.5" width="12" height="10" rx="2" fill="none" stroke="#D3A0A0" stroke-opacity="0.3" stroke-width="0.5"/>
+</svg>

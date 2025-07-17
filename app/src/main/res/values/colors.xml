@@ -2,4 +2,7 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="pink_manda">#F48FB1</color>
+    <color name="pink_gelap_manda">#F06292</color>
+    <color name="teal_manda">#4DB6AC</color>
 </resources>

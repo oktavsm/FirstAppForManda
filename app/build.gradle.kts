@@ -1,8 +1,7 @@
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
-
 }
 
 android {
@@ -28,12 +27,23 @@ android {
             )
         }
     }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+        isCoreLibraryDesugaringEnabled = true
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "1.8"
+    }
+
+    // --- (BARU) Aturan untuk Panitia (Gradle) ---
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            // Perintah ini yang paling penting untuk mengatasi error-mu
+            excludes += "META-INF/DEPENDENCIES"
+        }
     }
 }
 
@@ -50,10 +60,25 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    implementation(platform("com.google.firebase:firebase-bom:33.1.2")) // <-- PASTIKAN INI ADA
-    implementation("com.google.firebase:firebase-auth") // <-- PASTIKAN INI ADA
+    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+    implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-messaging-ktx")
+    implementation("com.google.firebase:firebase-storage-ktx")
 
+    // Untuk 'kamus modern' Java 8
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
-// Jika nanti pakai Firestore, tambahkan di sini
+    // Library kalender
+    implementation("com.kizitonwose.calendar:view:2.5.1")
+
+    // Library Google Sign-In & API
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
+    implementation("com.google.api-client:google-api-client-android:2.2.0")
+    implementation("com.google.apis:google-api-services-calendar:v3-rev20220715-2.0.0")
+
+    // Library Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 }
