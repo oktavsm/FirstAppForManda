@@ -1,0 +1,13 @@
+<svg width="108" height="108" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+    <!-- Latar belakang transparan untuk foreground, karena bentuknya akan dipotong oleh mask -->
+    <rect width="108" height="108" fill="none"/>
+
+    <!-- Bentuk hati besar yang lembut -->
+    <!-- Ini adalah elemen utama foreground, melambangkan cinta dan koneksi -->
+    <path d="M54 20.25C40.05 20.25 28.5 31.8 28.5 45.75C28.5 59.7 40.05 74.25 54 87.75C67.95 74.25 79.5 59.7 79.5 45.75C79.5 31.8 67.95 20.25 54 20.25Z" fill="#FFFFFF"/>
+
+    <!-- Dua lingkaran yang sedikit tumpang tindih di dalam hati -->
+    <!-- Melambangkan dua individu (Anda dan pacar Anda) yang saling terhubung -->
+    <circle cx="46" cy="55" r="12" fill="#F48FB1"/>
+    <circle cx="62" cy="55" r="12" fill="#F48FB1"/>
+</svg>

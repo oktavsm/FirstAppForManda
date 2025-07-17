@@ -1,0 +1,28 @@
+<svg width="108" height="108" viewBox="0 0 108 108" xmlns="http://www.w3.org/2000/svg">
+    <!-- Latar belakang transparan untuk foreground -->
+    <rect width="108" height="108" fill="none"/>
+
+    <!-- Karakter Kiri -->
+    <circle cx="40" cy="55" r="20" fill="#FFFFFF"/>
+    <!-- Pipi kiri -->
+    <circle cx="33" cy="60" r="5" fill="#F48FB1" opacity="0.7"/>
+    <!-- Tangan kiri (menuju tengah) -->
+    <circle cx="50" cy="65" r="8" fill="#FFFFFF"/>
+
+    <!-- Karakter Kanan -->
+    <circle cx="68" cy="55" r="20" fill="#FFFFFF"/>
+    <!-- Pipi kanan -->
+    <circle cx="75" cy="60" r="5" fill="#F48FB1" opacity="0.7"/>
+    <!-- Tangan kanan (menuju tengah) -->
+    <circle cx="58" cy="65" r="8" fill="#FFFFFF"/>
+
+    <!-- Bentuk hati yang terbentuk di antara kedua karakter (atau sebagai elemen tambahan) -->
+    <!-- Ini adalah hati yang lebih kecil, melengkapi interaksi mereka -->
+    <path d="M54 45L53.2929 44.2929C51.7251 42.7252 50 41.3333 50 39.5C50 37.8431 51.3431 36.5 53 36.5C53.732 36.5 54.433 36.8118 54.9239 37.3027L54 38.2267L53.0761 37.3027C53.567 36.8118 54.268 36.5 55 36.5C56.6569 36.5 58 37.8431 58 39.5C58 41.3333 56.2748 42.7252 54.7071 44.2929L54 45Z" fill="#F48FB1"/>
+
+    <!-- Mata (opsional, bisa bikin lebih lucu) -->
+    <circle cx="35" cy="50" r="2" fill="#333333"/>
+    <circle cx="45" cy="50" r="2" fill="#333333"/>
+    <circle cx="63" cy="50" r="2" fill="#333333"/>
+    <circle cx="73" cy="50" r="2" fill="#333333"/>
+</svg>

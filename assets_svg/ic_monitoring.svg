@@ -1,0 +1,8 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Hati pertama (lebih besar, di belakang) -->
+    <path d="M12 21.35L10.55 20.03C5.4 15.36 2 12.28 2 8.5C2 5.42 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.08C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.42 22 8.5C22 12.28 18.6 15.36 13.45 20.03L12 21.35Z" fill="#F48FB1"/>
+    <!-- Hati kedua (lebih kecil, di depan, sedikit tumpang tindih) -->
+    <path d="M14 18.35L12.55 17.03C7.4 12.36 4 9.28 4 5.5C4 2.42 6.42 0 9.5 0C11.24 0 12.91 0.81 14 2.08C15.09 0.81 16.76 0 18.5 0C21.58 0 24 2.42 24 5.5C24 9.28 20.6 12.36 15.45 17.03L14 18.35Z" fill="#FFCDD2" opacity="0.8"/>
+    <!-- Garis gelombang/pulsa di hati depan -->
+    <path d="M7 10C8.5 9 9.5 11 11 10C12.5 9 13.5 11 15 10" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

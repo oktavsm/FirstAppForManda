@@ -1,0 +1,13 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Bentuk dasar dua siluet kepala/orang yang saling berdekatan -->
+    <!-- Siluet kiri -->
+    <circle cx="9" cy="10" r="5" fill="#F48FB1"/>
+    <path d="M6 16C6 14.3431 7.34315 13 9 13C10.6569 13 12 14.3431 12 16V18H6V16Z" fill="#F48FB1"/>
+
+    <!-- Siluet kanan, sedikit tumpang tindih -->
+    <circle cx="15" cy="10" r="5" fill="#FFCDD2"/>
+    <path d="M12 16C12 14.3431 13.3431 13 15 13C16.6569 13 18 14.3431 18 16V18H12V16Z" fill="#FFCDD2"/>
+
+    <!-- Hati kecil di tengah, melambangkan hubungan -->
+    <path d="M12 14.5L11.2929 13.7929C9.72515 12.2252 8 10.8333 8 9C8 7.34315 9.34315 6 11 6C11.732 6 12.433 6.31179 12.9239 6.80269L12 7.7267L11.0761 6.80269C11.567 6.31179 12.268 6 13 6C14.6569 6 16 7.34315 16 9C16 10.8333 14.2748 12.2252 12.7071 13.7929L12 14.5Z" fill="#FFFFFF"/>
+</svg>

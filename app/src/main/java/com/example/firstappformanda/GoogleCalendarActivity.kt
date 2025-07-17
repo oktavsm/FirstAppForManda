@@ -1,0 +1,163 @@
+package com.example.firstappformanda // <- SESUAIKAN
+
+import android.app.Activity
+import android.content.Intent
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.Scope
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
+import com.google.api.client.http.javanet.NetHttpTransport
+import com.google.api.client.json.gson.GsonFactory
+import com.google.api.client.util.DateTime
+import com.google.api.services.calendar.CalendarScopes
+import com.google.api.services.calendar.model.Event
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
+class GoogleCalendarActivity : AppCompatActivity() {
+
+    private lateinit var rvGoogleEvents: RecyclerView
+    private lateinit var eventAdapter: GoogleEventAdapter
+    private val eventList = mutableListOf<GoogleCalendarEvent>()
+    private lateinit var googleSignInClient: GoogleSignInClient
+
+    // Launcher modern untuk menangani SEMUA hasil dari Google (Login & Izin)
+    private val googleApiLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            // Jika user berhasil login atau memberikan izin, kita selalu cek ulang dari awal
+            Log.d("GoogleCalendar", "ActivityResult OK. Re-checking permissions.")
+            checkPermissionsAndFetchEvents()
+        } else {
+            Toast.makeText(this, "Proses dibatalkan atau izin ditolak.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_google_calendar)
+
+        // Inisialisasi UI
+        rvGoogleEvents = findViewById(R.id.rv_google_events)
+        eventAdapter = GoogleEventAdapter(eventList)
+        rvGoogleEvents.layoutManager = LinearLayoutManager(this)
+        rvGoogleEvents.adapter = eventAdapter
+
+        // Konfigurasi dan mulai alur pengecekan
+        configureGoogleSignIn()
+        checkPermissionsAndFetchEvents()
+    }
+
+    private fun configureGoogleSignIn() {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestEmail()
+            .requestIdToken(getString(R.string.default_web_client_id)) // Minta "KTP Digital"
+            .requestScopes(Scope(CalendarScopes.CALENDAR_EVENTS)) // Minta izin baca/tulis Kalender
+            .build()
+        googleSignInClient = GoogleSignIn.getClient(this, gso)
+    }
+
+    private fun checkPermissionsAndFetchEvents() {
+        val account = GoogleSignIn.getLastSignedInAccount(this)
+        val calendarScope = Scope(CalendarScopes.CALENDAR_EVENTS)
+
+        if (account == null) {
+            // Jika belum pernah login sama sekali, mulai alur login
+            Log.d("GoogleCalendar", "No account found. Launching Sign-In.")
+            googleApiLauncher.launch(googleSignInClient.signInIntent)
+            return
+        }
+
+        if (GoogleSignIn.hasPermissions(account, calendarScope)) {
+            // Jika sudah punya izin, langsung ambil data
+            Log.d("GoogleCalendar", "Permission already granted. Fetching events.")
+            loadEventsFromApi()
+        } else {
+            // Jika sudah login tapi belum punya izin, minta izin
+            Log.d("GoogleCalendar", "Permission not granted. Launching permission request.")
+            googleApiLauncher.launch(googleSignInClient.signInIntent)
+        }
+    }
+
+    private fun loadEventsFromApi() {
+        val account = GoogleSignIn.getLastSignedInAccount(this)!!
+
+        val credential = GoogleAccountCredential.usingOAuth2(this, listOf(CalendarScopes.CALENDAR_EVENTS))
+            .setSelectedAccount(account.account)
+
+        val calendarService = com.google.api.services.calendar.Calendar.Builder(
+            NetHttpTransport(),
+            GsonFactory.getDefaultInstance(),
+            credential
+        )
+            .setApplicationName(getString(R.string.app_name))
+            .build()
+
+        Toast.makeText(this, "Mengambil jadwal dari Google...", Toast.LENGTH_SHORT).show()
+
+        // Jalankan di background agar UI tidak freeze
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val now = DateTime(System.currentTimeMillis())
+                val events = calendarService.events().list("primary")
+                    .setMaxResults(20) // Ambil 20 event terdekat
+                    .setTimeMin(now)   // Mulai dari sekarang
+                    .setQ("[FAFM]")    // Filter hanya yang punya tag [FAFM]
+                    .setOrderBy("startTime")
+                    .setSingleEvents(true)
+                    .execute()
+
+                val items: List<Event> = events.items ?: emptyList()
+                Log.d("GoogleCalendar", "Fetched ${items.size} events from Google API.")
+
+                val formattedEvents = items.mapNotNull { event ->
+                    val title = event.summary?.replace("[FAFM]", "")?.trim() ?: return@mapNotNull null
+                    val start = event.start?.dateTime ?: event.start?.date ?: return@mapNotNull null
+                    GoogleCalendarEvent(
+                        title = title,
+                        startTime = formatDateTime(start),
+                        endTime = event.end?.dateTime?.let { formatDateTime(it) }
+                    )
+                }
+
+                withContext(Dispatchers.Main) {
+                    eventList.clear()
+                    eventList.addAll(formattedEvents)
+                    eventAdapter.notifyDataSetChanged()
+                    if (formattedEvents.isEmpty()) {
+                        Toast.makeText(this@GoogleCalendarActivity, "Tidak ada jadwal dengan tag [FAFM] ditemukan.", Toast.LENGTH_LONG).show()
+                    }
+                }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@GoogleCalendarActivity, "Gagal mengambil data: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    private fun formatDateTime(dateTime: DateTime): String {
+        val date = Date(dateTime.value)
+        return if (dateTime.isDateOnly) {
+            SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()).format(date)
+        } else {
+            SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault()).format(date)
+        }
+    }
+}

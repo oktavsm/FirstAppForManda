@@ -1,0 +1,8 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Bentuk dasar kalender -->
+    <rect x="4" y="5" width="16" height="15" rx="2" fill="#FFFFFF"/>
+    <!-- Bagian atas kalender -->
+    <rect x="4" y="3" width="16" height="4" rx="1" fill="#E0BBE4"/>
+    <!-- Penanda hari ini (hati) -->
+    <path d="M12 16.5L11.2929 15.7929C9.72515 14.2252 8 12.8333 8 11C8 9.34315 9.34315 8 11 8C11.732 8 12.433 8.31179 12.9239 8.80269L12 9.7267L11.0761 8.80269C11.567 8.31179 12.268 8 13 8C14.6569 8 16 9.34315 16 11C16 12.8333 14.2748 14.2252 12.7071 15.7929L12 16.5Z" fill="#F48FB1"/>
+</svg>
