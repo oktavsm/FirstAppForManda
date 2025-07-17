@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp">
+
+    <!-- FrameLayout untuk menumpuk gambar dan placeholder -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- 1. Latar Belakang Placeholder (selalu ada di paling bawah) -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:background="#EAEAEA" />
+
+        <!-- 2. Foto Momen (akan menutupi latar belakang jika sudah di-upload) -->
+        <ImageView
+            android:id="@+id/iv_wish_photo"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:scaleType="centerCrop" />
+
+        <!-- 3. Ikon Placeholder (hanya muncul jika foto belum ada) -->
+        <ImageView
+            android:id="@+id/iv_placeholder_icon"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_placeholder_image"
+           />
+
+        <!-- Overlay Gelap di Bawah untuk Teks (agar teks selalu terbaca) -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_gravity="bottom"
+            android:background="@drawable/gradient_bottom" />
+
+        <!-- Judul Wishlist -->
+        <TextView
+            android:id="@+id/tv_wish_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:padding="16dp"
+            android:text="Liburan ke Bali"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- Tombol Hapus -->
+        <ImageView
+            android:id="@+id/iv_delete_wish"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="12dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="4dp"
+            android:src="@drawable/ic_delete"
+            app:tint="@null" />
+
+    </FrameLayout>
+
+</com.google.android.material.card.MaterialCardView>

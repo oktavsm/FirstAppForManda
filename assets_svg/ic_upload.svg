@@ -1,0 +1,15 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Lingkaran latar belakang yang lembut -->
+    <circle cx="12" cy="12" r="10" fill="#F48FB1"/>
+
+    <!-- Panah ke atas (simbol upload) -->
+    <path d="M12 7V17M12 7L9 10M12 7L15 10" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Base kecil di bawah panah, melambangkan "platform" upload -->
+    <rect x="9" y="16" width="6" height="2" rx="1" fill="#FFFFFF"/>
+
+    <!-- Opsional: Hati kecil di dekat panah untuk sentuhan lucu -->
+    <path d="M12 5.5L11.2929 4.79289C10.7251 4.22515 10 3.83333 10 3C10 2.34315 10.3431 2 11 2C11.732 2 12.433 2.31179 12.9239 2.80269L12 3.7267L11.0761 2.80269C11.567 2.31179 12.268 2 13 2C14.6569 2 16 3.34315 16 5C16 6.83333 14.2748 8.22515 12.7071 9.79289L12 10.5Z"
+        fill="#FFCDD2"
+        transform="translate(0, -1) scale(0.3)"/>
+</svg>

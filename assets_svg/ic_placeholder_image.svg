@@ -1,0 +1,18 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Bentuk dasar bingkai foto/area gambar -->
+    <rect x="3" y="3" width="18" height="18" rx="3" fill="#FFCDD2"/>
+
+    <!-- Latar belakang langit/area kosong di dalam bingkai -->
+    <rect x="4" y="4" width="16" height="16" rx="2" fill="#FFFFFF"/>
+
+    <!-- Bentuk gunung minimalis (melambangkan pemandangan yang belum terisi foto) -->
+    <path d="M4 16L9 9L14 16L20 16L17 12L14 16L11 12L8 16L4 16Z" fill="#E0BBE4"/>
+
+    <!-- Bentuk matahari/bulan di pojok atas -->
+    <circle cx="17" cy="7" r="3" fill="#F48FB1"/>
+
+    <!-- Hati kecil di dalam matahari/bulan (sentuhan couple) -->
+    <path d="M17 8.5L16.2929 7.79289C14.7251 6.22515 13 4.83333 13 3C13 1.34315 14.3431 0 16 0C16.732 0 17.433 0.31179 17.9239 0.80269L17 1.7267L16.0761 0.80269C16.567 0.31179 17.268 0 18 0C19.6569 0 21 1.34315 21 3C21 4.83333 19.2748 6.22515 17.7071 7.79289L17 8.5Z"
+        fill="#FFFFFF"
+        transform="translate(14.5 4.5) scale(0.2)"/>
+</svg>
