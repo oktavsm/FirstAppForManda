@@ -4,73 +4,40 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
     tools:context=".MainActivity">
 
-    <LinearLayout
-        android:id="@+id/layout_logged_in"
-        android:layout_width="wrap_content"
+    <!-- Header: Bagian Atas Aplikasi -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/top_app_bar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="Dasbor"
+            app:titleTextColor="?attr/colorOnPrimary"
+            android:background="?attr/colorPrimary" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Body: Tempat "Kamar" (Fragment) akan ditampilkan -->
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/app_bar_layout"
+        android:layout_above="@id/bottom_navigation"/>
+
+    <!-- Footer: Navigasi Bawah -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_centerInParent="true"
-        android:gravity="center"
-        android:visibility="gone"
-        tools:visibility="visible">
-
-        <TextView
-            android:id="@+id/tv_welcome_message"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Selamat Datang!"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="24dp"/>
-
-        <Button
-            android:id="@+id/btn_to_todo"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:text="Lihat Tugas"
-            android:layout_marginBottom="8dp"/>
-
-        <Button
-            android:id="@+id/btn_to_couple"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:text="Hubungkan Pasangan"
-            android:layout_marginBottom="8dp"/>
-
-        <Button
-            android:id="@+id/btn_logout"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:text="Logout"/>
-
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/layout_logged_out"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_centerInParent="true"
-        android:gravity="center"
-        android:visibility="visible">
-
-        <Button
-            android:id="@+id/btn_to_login"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:text="Login"
-            android:layout_marginBottom="16dp"/>
-
-        <Button
-            android:id="@+id/btn_to_register"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:text="Register"/>
-
-    </LinearLayout>
+        android:layout_alignParentBottom="true"
+        app:menu="@menu/bottom_nav_menu"
+        app:itemIconTint="@null"
+        app:itemTextColor="@color/bottom_nav_item_color" />
 
 </RelativeLayout>

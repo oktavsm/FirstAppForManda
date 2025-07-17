@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        tools:context=".ActivityDetailActivity">
+
+        <EditText
+            android:id="@+id/et_detail_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Judul Aktivitas"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"/>
+
+        <EditText
+            android:id="@+id/et_detail_notes"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:hint="Tulis catatan di sini..."
+            android:gravity="top"/>
+
+        <!-- (BARU) Kotak Waktu yang Berlaku untuk Semua Tipe -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Waktu Mulai:"
+            android:layout_marginTop="16dp"/>
+        <TextView
+            android:id="@+id/tv_start_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Pilih tanggal &amp; waktu"
+            android:textSize="18sp"
+            android:padding="8dp"
+            android:background="?attr/editTextBackground"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Waktu Selesai:"
+            android:layout_marginTop="16dp"/>
+        <TextView
+            android:id="@+id/tv_end_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Pilih tanggal &amp; waktu"
+            android:textSize="18sp"
+            android:padding="8dp"
+            android:background="?attr/editTextBackground"/>
+
+        <!-- Spacer untuk mendorong tombol ke bawah -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_add_to_calendar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tambah ke Google Calendar"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_marginTop="16dp"/>
+
+        <!-- (BARU) Tombol Hapus -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_delete_activity"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Hapus Aktivitas Ini"
+            android:textColor="@android:color/holo_red_dark"
+            app:strokeColor="@android:color/holo_red_dark"
+            android:visibility="gone"
+            tools:visibility="visible"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_save_activity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Simpan"
+            android:layout_marginTop="8dp"/>
+
+    </LinearLayout>
+</ScrollView>
