@@ -4,14 +4,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 
-class TodoPagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
+class AuthPagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
 
-    override fun getItemCount(): Int = 2 // Kita punya 2 tab
+    override fun getItemCount(): Int = 2
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            0 -> MyTasksFragment() // Tab pertama untuk tugas kita
-            1 -> PartnerTasksFragment() // Tab kedua untuk tugas pasangan
+            0 -> LoginFragment()
+            1 -> RegisterFragment()
             else -> throw IllegalStateException("Invalid position $position")
         }
     }

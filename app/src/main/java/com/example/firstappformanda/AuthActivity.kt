@@ -6,23 +6,20 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
-class TodoActivity : AppCompatActivity() {
-
+class AuthActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_todo)
+        setContentView(R.layout.activity_auth)
 
-        val tabLayout: TabLayout = findViewById(R.id.tab_layout)
-        val viewPager: ViewPager2 = findViewById(R.id.view_pager)
+        val tabLayout: TabLayout = findViewById(R.id.tab_layout_auth)
+        val viewPager: ViewPager2 = findViewById(R.id.view_pager_auth)
 
-        // Hubungkan ViewPager dengan Adapter-nya
-        viewPager.adapter = TodoPagerAdapter(this)
+        viewPager.adapter = AuthPagerAdapter(this)
 
-        // Hubungkan TabLayout dengan ViewPager
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = when (position) {
-                0 -> "Tugasku"
-                1 -> "Tugas Pasangan"
+                0 -> "Login"
+                1 -> "Register"
                 else -> null
             }
         }.attach()

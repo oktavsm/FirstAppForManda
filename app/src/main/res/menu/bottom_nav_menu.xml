@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_dashboard"
+        android:icon="@drawable/ic_dashboard"
+        android:title="Dasbor" />
+
+    <item
+        android:id="@+id/navigation_monitoring"
+        android:icon="@drawable/ic_monitoring"
+        android:title="Monitoring" />
+
+    <item
+        android:id="@+id/navigation_productivity"
+        android:icon="@drawable/ic_productivity"
+        android:title="Produktivitas" />
+
+    <item
+        android:id="@+id/navigation_chat"
+        android:icon="@drawable/ic_chat"
+        android:title="Chat" />
+
+</menu>

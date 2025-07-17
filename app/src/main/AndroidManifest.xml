@@ -2,6 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <queries>
+
+        <!-- Izinkan aplikasi kita untuk "melihat" aplikasi yang bisa menangani pembuatan event kalender -->
+        <intent>
+            <action android:name="android.intent.action.INSERT" />
+
+            <data android:mimeType="vnd.android.cursor.item/event" />
+        </intent>
+    </queries>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -11,6 +21,39 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FirstAppForManda">
+        <activity
+            android:name=".WishlistDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".WishlistActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AuthActivity"
+            android:exported="false" />
+        <activity
+            android:name=".OnboardingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".GoogleCalendarActivity"
+            android:exported="false" />
+        <activity
+            android:name=".GoogleCalendar"
+            android:exported="false" />
+        <activity
+            android:name=".GenderSelectionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ChatActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ActivityDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PartnerDashboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MonitoringActivity"
+            android:exported="false" />
         <activity
             android:name=".CoupleActivity"
             android:exported="false" />
@@ -24,14 +67,35 @@
             android:name=".RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity> <!-- MainActivity tidak lagi punya intent-filter LAUNCHER -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+
+            <!-- Tidak ada intent-filter di sini -->
         </activity>
+
+        <service
+            android:name=".MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/default_notification_channel_id" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_notification" />
     </application>
 
 </manifest>
