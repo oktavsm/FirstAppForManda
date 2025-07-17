@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5"
+    tools:context=".DashboardFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Kartu 1: Detail Hubungan -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+                <TextView android:id="@+id/tv_couple_names" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Kamu &amp; Manda" android:textSize="20sp" android:textStyle="bold" android:layout_gravity="center_horizontal"/>
+                <TextView android:id="@+id/tv_anniversary_info" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Bersama sejak..." android:layout_gravity="center_horizontal" android:layout_marginTop="4dp"/>
+                <TextView android:id="@+id/tv_days_together" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="... hari" android:textSize="24sp" android:textStyle="bold" android:textColor="?attr/colorPrimary" android:layout_gravity="center_horizontal" android:layout_marginTop="8dp"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Kartu 2: Info & Kondisi Pasangan -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_partner_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            android:visibility="gone" tools:visibility="visible">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal" android:layout_marginBottom="12dp">
+                    <ImageView android:id="@+id/iv_partner_icon" android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_favorite"/>
+                    <TextView android:id="@+id/tv_partner_status_title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Update dari Manda" android:textSize="18sp" android:textStyle="bold" android:layout_marginStart="12dp"/>
+                </LinearLayout>
+
+                <!-- Info Detail Pasangan -->
+                <TextView android:id="@+id/tv_partner_last_note" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Catatan terakhir: ..." android:maxLines="2" android:ellipsize="end" android:layout_marginBottom="8dp"/>
+                <GridLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:columnCount="2">
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:orientation="vertical" android:layout_columnWeight="1" android:gravity="center" android:padding="8dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Mood" android:textSize="12sp"/>
+                        <TextView android:id="@+id/tv_partner_mood" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="-" android:textSize="24sp"/>
+                    </LinearLayout>
+                    <LinearLayout android:id="@+id/layout_partner_phase" android:layout_width="0dp" android:layout_height="wrap_content" android:orientation="vertical" android:layout_columnWeight="1" android:gravity="center" android:padding="8dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Fase" android:textSize="12sp"/>
+                        <TextView android:id="@+id/tv_partner_phase" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="-" android:textSize="16sp" android:textStyle="bold"/>
+                    </LinearLayout>
+                </GridLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Kartu 3: Agendaku Hari Ini -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Agendaku Hari Ini" android:textSize="18sp" android:textStyle="bold" />
+                <ProgressBar android:id="@+id/progress_bar_my_agenda" style="?android:attr/progressBarStyle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_marginTop="16dp" android:visibility="gone"/>
+                <androidx.recyclerview.widget.RecyclerView android:id="@+id/rv_my_agenda" android:layout_width="match_parent" android:layout_height="wrap_content" tools:itemCount="2" tools:listitem="@layout/item_agenda" />
+                <TextView android:id="@+id/tv_empty_my_agenda" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_marginTop="16dp" android:text="Tidak ada agenda." android:visibility="gone" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Kartu 4: Agenda Pasangan Hari Ini -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_partner_agenda"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            android:visibility="gone" tools:visibility="visible">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+                <TextView android:id="@+id/tv_partner_agenda_title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Agenda Pasangan Hari Ini" android:textSize="18sp" android:textStyle="bold" />
+                <ProgressBar android:id="@+id/progress_bar_partner_agenda" style="?android:attr/progressBarStyle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_marginTop="16dp" android:visibility="gone"/>
+                <androidx.recyclerview.widget.RecyclerView android:id="@+id/rv_partner_agenda" android:layout_width="match_parent" android:layout_height="wrap_content" tools:itemCount="1" tools:listitem="@layout/item_agenda" />
+                <TextView android:id="@+id/tv_empty_partner_agenda" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:layout_marginTop="16dp" android:text="Pasangan tidak punya agenda." android:visibility="gone" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+</ScrollView>
