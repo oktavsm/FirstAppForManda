@@ -3,6 +3,13 @@
     <style name="Base.Theme.FirstAppForManda" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/pink_manda</item>
+        <item name="colorPrimaryVariant">@color/pink_gelap_manda</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/teal_manda</item>
+        <item name="colorSecondaryVariant">@color/teal_manda</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="android:fontFamily">@font/montserrat</item>
     </style>
 
     <style name="Theme.FirstAppForManda" parent="Base.Theme.FirstAppForManda" />

@@ -1,5 +1,9 @@
 <resources>
-    <string name="app_name">FirstAppForManda</string>
+    <string name="app_name">Muel App</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="default_notification_channel_id">Notifikasi Umum</string>
+    <string name="default_web_client_id">912996563648-k91m442rub88sbfgm1m9g87n49mvtobd.apps.googleusercontent.com</string>
 </resources>
