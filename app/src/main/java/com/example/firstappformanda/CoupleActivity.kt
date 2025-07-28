@@ -98,8 +98,8 @@ class CoupleActivity : AppCompatActivity() {
 
                 batch.commit().addOnSuccessListener {
                     Toast.makeText(this, "Berhasil terhubung!", Toast.LENGTH_SHORT).show()
-                    // Kirim sinyal kembali ke MainActivity bahwa ada perubahan
                     val resultIntent = Intent()
+                    resultIntent.putExtra("refresh", true) // Sinyal untuk refresh
                     // Anda bisa menambahkan data tambahan ke intent jika diperlukan
                     setResult(Activity.RESULT_OK, resultIntent)
                     finish()

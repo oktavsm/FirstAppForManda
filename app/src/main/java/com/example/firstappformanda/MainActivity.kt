@@ -1,12 +1,17 @@
 package com.example.firstappformanda // <- SESUAIKAN
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.Menu
+import android.util.Log // Import Log
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import androidx.core.app.ActivityCompat // Import untuk requestPermissions
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -16,9 +21,11 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 
 class MainActivity : AppCompatActivity() {
 
+    private val TAG = "MainActivity" // Tag untuk Logcat
     // --- Deklarasi Variabel ---
     private lateinit var topAppBar: MaterialToolbar
     private lateinit var bottomNavigation: BottomNavigationView
@@ -28,6 +35,15 @@ class MainActivity : AppCompatActivity() {
 
     private var hasPartner: Boolean = false // Untuk melacak status hubungan
 
+    // Konstanta untuk kode permintaan izin
+    private val REQUEST_CALENDAR_PERMISSIONS = 123
+
+    // (BARU) Launcher untuk meminta izin kalender
+    private val requestCalendarPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            // Tindakan setelah izin diberikan atau ditolak bisa ditambahkan di sini jika perlu
+            // Misalnya, menampilkan pesan jika izin ditolak
+        }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -36,6 +52,9 @@ class MainActivity : AppCompatActivity() {
         initializeFirebase()
         initializeViews()
         configureGoogleSignIn()
+
+        // (BARU) Minta izin kalender jika belum ada
+        requestCalendarPermissionIfNeeded()
 
         // Atur Toolbar sebagai Action Bar aplikasi
         setSupportActionBar(topAppBar)
@@ -87,6 +106,25 @@ class MainActivity : AppCompatActivity() {
         firestore = FirebaseFirestore.getInstance()
     }
 
+    // (BARU) Fungsi untuk meminta izin kalender jika belum diberikan
+    // (MODIFIKASI) Selalu minta akses izin ke Google Calendar API jika belum ada
+    private fun requestCalendarPermissionIfNeeded() {
+        val hasReadCalendarPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED
+        val hasWriteCalendarPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALENDAR) == PackageManager.PERMISSION_GRANTED
+
+        if (!hasReadCalendarPermission || !hasWriteCalendarPermission) {
+            // Jika salah satu atau kedua izin belum diberikan, minta keduanya.
+            // Anda bisa meminta satu per satu jika ingin penanganan yang lebih spesifik.
+            // Di sini, kita akan meminta keduanya sekaligus.
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR),
+                REQUEST_CALENDAR_PERMISSIONS
+            )
+            // Atau, jika Anda ingin menggunakan ActivityResultLauncher untuk satu izin saja (misal WRITE_CALENDAR yang biasanya sudah mencakup READ):
+            // requestCalendarPermissionLauncher.launch(Manifest.permission.WRITE_CALENDAR)
+        }}
+
     private fun initializeViews() {
         topAppBar = findViewById(R.id.top_app_bar)
         bottomNavigation = findViewById(R.id.bottom_navigation)
@@ -97,6 +135,8 @@ class MainActivity : AppCompatActivity() {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()
+            // (BARU) Tambahkan scope untuk Google Calendar API
+            .requestScopes(com.google.android.gms.common.api.Scope("https://www.googleapis.com/auth/calendar"))
             .build()
         googleSignInClient = GoogleSignIn.getClient(this, gso)
     }
@@ -106,6 +146,7 @@ class MainActivity : AppCompatActivity() {
             navigateToAuth()
         } else {
             fetchUserData()
+            checkAndRefreshFcmToken() // Panggil fungsi cek FCM token
         }
     }
     private fun fetchUserData() {
@@ -113,11 +154,57 @@ class MainActivity : AppCompatActivity() {
         firestore.collection("users").document(userId).get()
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
-                    val coupleId = document.getString("coupleId")
-                    hasPartner = !coupleId.isNullOrEmpty()
+                    // (BARU) Cek apakah gender sudah dipilih
+                    val gender = document.getString("gender")
+                    if (gender.isNullOrEmpty()) {
+                        // Jika belum, arahkan ke GenderSelectionActivity
+                        startActivity(Intent(this, GenderSelectionActivity::class.java))
+                        finishAffinity() // Tutup semua activity sebelumnya
+                        return@addOnSuccessListener // Hentikan eksekusi lebih lanjut
+                    }
+                    val coupleId = document.getString("coupleId") // Pindahkan ini setelah pengecekan gender
+                    hasPartner = !coupleId.isNullOrEmpty() // Pindahkan ini setelah pengecekan gender
                     invalidateOptionsMenu() // Perintahkan menu untuk gambar ulang dirinya
                 }
             }
+    }
+
+    // (BARU) Fungsi untuk cek FCM token dan refresh ke Firestore
+    private fun checkAndRefreshFcmToken() {
+        val userId = auth.currentUser?.uid ?: return
+        val userDocRef = firestore.collection("users").document(userId)
+
+        userDocRef.get().addOnSuccessListener { document ->
+            if (document != null && document.exists()) {
+                val currentFcmToken = document.getString("fcmToken")
+                Log.d(TAG, "Current FCM Token from Firestore: $currentFcmToken")
+                FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val newToken = task.result
+                        Log.d(TAG, "New FCM Token from FirebaseMessaging: $newToken")
+                        // Perbarui token jika belum ada atau berbeda
+                        if (currentFcmToken.isNullOrEmpty() || currentFcmToken != newToken) {
+                            Log.d(TAG, "FCM Token is null, empty, or different. Updating Firestore.")
+                            userDocRef.update("fcmToken", newToken)
+                                .addOnSuccessListener {
+                                    Log.d(TAG, "FCM token successfully updated in Firestore.")
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.e(TAG, "Failed to update FCM token in Firestore.", e)
+                                }
+                        } else {
+                            Log.d(TAG, "FCM Token is already up-to-date in Firestore.")
+                        }
+                    } else {
+                        Log.w(TAG, "Fetching FCM registration token failed", task.exception)
+                    }
+                }
+            } else {
+                Log.d(TAG, "User document does not exist for FCM token check.")
+            }
+        }.addOnFailureListener { e ->
+            Log.e(TAG, "Error getting user document for FCM token check", e)
+        }
     }
     // (BARU) Launcher untuk menerima sinyal dari CoupleActivity
     private val coupleActivityResultLauncher = registerForActivityResult(
@@ -223,4 +310,21 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
         finishAffinity()
     }
+
+    // (BARU) Override untuk menangani hasil permintaan izin runtime
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            REQUEST_CALENDAR_PERMISSIONS -> {
+                if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+                    // Izin diberikan
+                    Log.d(TAG, "Izin kalender diberikan.")
+                    // Anda bisa melanjutkan dengan fungsionalitas kalender di sini jika perlu
+                } else {
+                    // Izin ditolak
+                    Log.d(TAG, "Izin kalender ditolak.")
+                    Toast.makeText(this, "Izin kalender dibutuhkan untuk fitur tertentu.", Toast.LENGTH_LONG).show()
+                }
+            }
+        }    }
 }

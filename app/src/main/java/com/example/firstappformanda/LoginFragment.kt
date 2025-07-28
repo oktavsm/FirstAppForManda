@@ -22,6 +22,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
+import com.google.firebase.messaging.FirebaseMessaging
 
 class LoginFragment : Fragment() {
 
@@ -34,7 +36,6 @@ class LoginFragment : Fragment() {
     private lateinit var btnLogin: MaterialButton
     private lateinit var btnGoogleSignIn: SignInButton
 
-    // Launcher untuk menangani hasil dari Google Sign-In
     private val googleSignInLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -44,7 +45,8 @@ class LoginFragment : Fragment() {
                 val account = task.getResult(ApiException::class.java)!!
                 firebaseAuthWithGoogle(account)
             } catch (e: ApiException) {
-                Log.w("GoogleSignIn", "Google sign in failed", e)
+                Log.w("GoogleSignIn", "Google sign in failed in LoginFragment", e)
+                Toast.makeText(requireContext(), "Login Google Gagal", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -92,7 +94,6 @@ class LoginFragment : Fragment() {
         firebaseAuth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    // Jika login berhasil, cek profilnya
                     checkUserProfile(task.result.user!!)
                 } else {
                     Toast.makeText(requireContext(), "Login Gagal: ${task.exception?.message}", Toast.LENGTH_LONG).show()
@@ -101,8 +102,10 @@ class LoginFragment : Fragment() {
     }
 
     private fun signInWithGoogle() {
-        val signInIntent = googleSignInClient.signInIntent
-        googleSignInLauncher.launch(signInIntent)
+        googleSignInClient.signOut().addOnCompleteListener {
+            val signInIntent = googleSignInClient.signInIntent
+            googleSignInLauncher.launch(signInIntent)
+        }
     }
 
     private fun firebaseAuthWithGoogle(account: GoogleSignInAccount) {
@@ -117,29 +120,27 @@ class LoginFragment : Fragment() {
             }
     }
 
-    // Ini fungsi "penentu arah" yang sama persis seperti di RegisterFragment
     private fun checkUserProfile(firebaseUser: FirebaseUser) {
         val userId = firebaseUser.uid
         val userDocRef = firestore.collection("users").document(userId)
 
         userDocRef.get().addOnSuccessListener { documentSnapshot ->
             if (documentSnapshot.exists()) {
-                val gender = documentSnapshot.getString("gender")
-                if (gender.isNullOrEmpty()) {
-                    // Jika profil ada tapi gender kosong -> ke halaman pilih gender
-                    navigateTo(GenderSelectionActivity::class.java)
-                } else {
-                    // Jika profil lengkap -> ke halaman utama
-                    navigateTo(MainActivity::class.java)
-                }
+                // User sudah ada, update FCM token dan navigasi
+                saveFcmTokenAndNavigate(userId, documentSnapshot.getString("gender"), false)
             } else {
-                // Jika user login Google pertama kali, buat profil baru
+                // User baru, buat dokumen baru, simpan FCM token, dan navigasi
                 val newUser = hashMapOf(
-                    "userId" to userId, "nama" to firebaseUser.displayName,
-                    "email" to firebaseUser.email, "gender" to "", "coupleId" to ""
+                    "userId" to userId,
+                    "nama" to firebaseUser.displayName,
+                    "email" to firebaseUser.email,
+                    "gender" to "", // Gender akan diisi nanti
+                    "coupleId" to "" // Couple ID akan diisi nanti
                 )
                 userDocRef.set(newUser).addOnSuccessListener {
-                    navigateTo(GenderSelectionActivity::class.java)
+                    saveFcmTokenAndNavigate(userId, "", true)
+                }.addOnFailureListener { e ->
+                    Toast.makeText(requireContext(), "Gagal membuat profil baru: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
         }.addOnFailureListener {
@@ -147,6 +148,42 @@ class LoginFragment : Fragment() {
         }
     }
 
+    private fun saveFcmTokenAndNavigate(userId: String, gender: String?, isNewUser: Boolean) {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val token = task.result
+                val tokenData = hashMapOf("fcmToken" to token)
+
+                firestore.collection("users").document(userId)
+                    .set(tokenData, SetOptions.merge())
+                    .addOnSuccessListener {
+                        Log.d("LoginFragment", "FCM token saved successfully for user: $userId")
+                        if (isNewUser || gender.isNullOrEmpty()) {
+                            navigateTo(GenderSelectionActivity::class.java)
+                        } else {
+                            navigateTo(MainActivity::class.java)
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        Log.w("LoginFragment", "Error saving FCM token for user: $userId", e)
+                        // Tetap lanjut meskipun gagal menyimpan token, karena login sudah berhasil
+                        if (isNewUser || gender.isNullOrEmpty()) {
+                            navigateTo(GenderSelectionActivity::class.java)
+                        } else {
+                            navigateTo(MainActivity::class.java)
+                        }
+                    }
+            } else {
+                Log.w("LoginFragment", "Fetching FCM registration token failed for user: $userId", task.exception)
+                // Tetap lanjut meskipun gagal mendapatkan token FCM, karena login sudah berhasil
+                if (isNewUser || gender.isNullOrEmpty()) {
+                    navigateTo(GenderSelectionActivity::class.java)
+                } else {
+                    navigateTo(MainActivity::class.java)
+                }
+            }
+        }
+    }
     private fun navigateTo(activityClass: Class<*>) {
         val intent = Intent(requireActivity(), activityClass)
         startActivity(intent)

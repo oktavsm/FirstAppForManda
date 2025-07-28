@@ -100,7 +100,7 @@ class PartnerMonitoringFragment : Fragment() {
                     view?.findViewById<LinearLayout>(R.id.layout_send_reminder)?.visibility = View.GONE
                     return@addOnSuccessListener
                 }
-                this.partnerId = coupleId
+                // this.partnerId sudah di-set saat mengambil data coupleId dari Firestore.
                 checkPartnerGenderAndLoadData(coupleId)
             }
     }
@@ -109,10 +109,12 @@ class PartnerMonitoringFragment : Fragment() {
         firestore.collection("users").document(partnerId).get()
             .addOnSuccessListener { partnerDocument ->
                 val partnerGender = partnerDocument.getString("gender")
+                this.partnerId = partnerId // Simpan partnerId di sini setelah memastikan partner ada
                 if (partnerGender == "Wanita") {
                     layoutPrediction.visibility = View.VISIBLE
                     loadAllPartnerLogs(partnerId, true)
                 } else {
+                    // Jika pasangan adalah pria, fitur prediksi dan fase tidak relevan
                     layoutPrediction.visibility = View.GONE
                     loadAllPartnerLogs(partnerId, false)
                 }
@@ -198,20 +200,29 @@ class PartnerMonitoringFragment : Fragment() {
 
     private fun sendNotificationRequest(message: String) {
         val myUserId = auth.currentUser?.uid ?: return
-        val request = hashMapOf(
-            "fromUserId" to myUserId,
-            "toUserId" to partnerId,
-            "message" to message,
-            "timestamp" to System.currentTimeMillis()
-        )
-        firestore.collection("notification_requests").add(request)
-            .addOnSuccessListener {
-                Toast.makeText(requireContext(), "Permintaan reminder terkirim!", Toast.LENGTH_SHORT).show()
-                etReminder.text.clear()
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(requireContext(), "Gagal mengirim: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+        // Pastikan partnerId tidak null sebelum mengirim notifikasi
+        partnerId?.let { pId ->
+            val request = hashMapOf(
+                "fromUserId" to myUserId,
+                "toUserId" to pId, // Gunakan pId yang sudah pasti non-null
+                "message" to message,
+                "timestamp" to System.currentTimeMillis()
+            )
+            Log.d("PartnerMonitoring", "Mencoba mengirim notifikasi: $request")
+            firestore.collection("notification_requests").add(request)
+                .addOnSuccessListener {
+                    Log.d("PartnerMonitoring", "Notifikasi berhasil dikirim. ID Dokumen: ${it.id}")
+                    Toast.makeText(requireContext(), "Permintaan reminder terkirim!", Toast.LENGTH_SHORT).show()
+                    etReminder.text.clear()
+                }
+                .addOnFailureListener { e ->
+                    Log.e("PartnerMonitoring", "Gagal mengirim notifikasi", e)
+                    Toast.makeText(requireContext(), "Gagal mengirim: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        } ?: run {
+            Toast.makeText(requireContext(), "Pasangan tidak ditemukan untuk mengirim notifikasi.", Toast.LENGTH_SHORT).show()
+            Log.w("PartnerMonitoring", "Gagal mengirim notifikasi: partnerId null")
+        }
     }
 
     private fun calculateAndDisplayPrediction(dates: List<LocalDate>) {

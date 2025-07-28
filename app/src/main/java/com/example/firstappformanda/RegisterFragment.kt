@@ -22,6 +22,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
+import com.google.firebase.messaging.FirebaseMessaging
 
 class RegisterFragment : Fragment() {
 
@@ -45,7 +47,8 @@ class RegisterFragment : Fragment() {
                 val account = task.getResult(ApiException::class.java)!!
                 firebaseAuthWithGoogle(account)
             } catch (e: ApiException) {
-                Log.w("GoogleSignIn", "Google sign in failed", e)
+                Log.w("GoogleSignIn", "Google sign in failed in RegisterFragment", e)
+                Toast.makeText(requireContext(), "Login Google Gagal", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -105,8 +108,10 @@ class RegisterFragment : Fragment() {
     }
 
     private fun signInWithGoogle() {
-        val signInIntent = googleSignInClient.signInIntent
-        googleSignInLauncher.launch(signInIntent)
+        googleSignInClient.signOut().addOnCompleteListener { // Selalu sign out dulu untuk memastikan bisa pilih akun
+            val signInIntent = googleSignInClient.signInIntent
+            googleSignInLauncher.launch(signInIntent)
+        }
     }
 
     private fun firebaseAuthWithGoogle(account: GoogleSignInAccount) {
@@ -115,15 +120,14 @@ class RegisterFragment : Fragment() {
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val firebaseUser = task.result.user!!
-                    // Cek apakah user ini sudah ada di Firestore
                     val userDocRef = firestore.collection("users").document(firebaseUser.uid)
+
                     userDocRef.get().addOnSuccessListener { documentSnapshot ->
                         if (!documentSnapshot.exists()) {
-                            // Jika belum ada, buat dokumen baru
                             createNewUserDocument(firebaseUser, firebaseUser.displayName ?: "", firebaseUser.email ?: "")
                         } else {
-                            // Jika sudah ada, langsung lempar ke pilih gender (atau main)
-                            navigateToGenderSelection()
+                            // Jika user sudah ada tapi mencoba daftar lagi, anggap sebagai login
+                            checkUserProfile(firebaseUser)
                         }
                     }
                 } else {
@@ -144,15 +148,69 @@ class RegisterFragment : Fragment() {
 
         firestore.collection("users").document(userId).set(userMap)
             .addOnSuccessListener {
-                navigateToGenderSelection()
+                saveFcmTokenAndNavigate(userId, GenderSelectionActivity::class.java)
             }
             .addOnFailureListener {
                 Toast.makeText(requireContext(), "Gagal membuat profil.", Toast.LENGTH_SHORT).show()
             }
     }
 
-    private fun navigateToGenderSelection() {
-        val intent = Intent(requireActivity(), GenderSelectionActivity::class.java)
+    // Fungsi ini akan dipanggil dari LoginFragment juga
+    fun checkUserProfile(firebaseUser: FirebaseUser) {
+        val userId = firebaseUser.uid
+        val userDocRef = firestore.collection("users").document(userId)
+
+        userDocRef.get().addOnSuccessListener { documentSnapshot ->
+            if (documentSnapshot.exists()) {
+                saveFcmTokenToFirestore(userId) {
+                    val gender = documentSnapshot.getString("gender")
+                    if (gender.isNullOrEmpty()) {
+                        navigateTo(GenderSelectionActivity::class.java)
+                    } else {
+                        navigateTo(MainActivity::class.java)
+                    }
+                }
+            } else {
+                createNewUserDocument(firebaseUser, firebaseUser.displayName ?: "", firebaseUser.email ?: "")
+            }
+        }
+    }
+
+    private fun saveFcmTokenToFirestore(userId: String, onComplete: () -> Unit) {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val token = task.result
+                val tokenData = hashMapOf("fcmToken" to token)
+                firestore.collection("users").document(userId)
+                    .set(tokenData, SetOptions.merge())
+                    .addOnCompleteListener { onComplete() }
+            } else {
+                // Tetap panggil onComplete meskipun gagal dapat token
+                Log.w("FCM", "Fetching FCM registration token failed", task.exception)
+                onComplete()
+            }
+        }
+    }
+
+    private fun saveFcmTokenAndNavigate(userId: String, destination: Class<*>) {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val token = task.result
+                val tokenData = hashMapOf("fcmToken" to token)
+                firestore.collection("users").document(userId)
+                    .set(tokenData, SetOptions.merge())
+                    .addOnCompleteListener {
+                        navigateTo(destination)
+                    }
+            } else {
+                // Tetap lanjut meskipun gagal dapat token
+                navigateTo(destination)
+            }
+        }
+    }
+
+    private fun navigateTo(activityClass: Class<*>) {
+        val intent = Intent(requireActivity(), activityClass)
         startActivity(intent)
         requireActivity().finishAffinity()
     }

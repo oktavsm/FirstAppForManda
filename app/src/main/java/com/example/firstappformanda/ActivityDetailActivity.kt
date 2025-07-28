@@ -182,6 +182,12 @@ class ActivityDetailActivity : AppCompatActivity() {
             return
         }
 
+        // --- VALIDASI WAKTU ---
+        if (startCalendar.timeInMillis >= endCalendar.timeInMillis) {
+            Toast.makeText(this, "Waktu selesai harus setelah waktu mulai.", Toast.LENGTH_LONG).show()
+            return
+        }
+
         val credential = GoogleAccountCredential.usingOAuth2(this, listOf(CalendarScopes.CALENDAR_EVENTS))
             .setSelectedAccount(account.account)
 
@@ -203,7 +209,10 @@ class ActivityDetailActivity : AppCompatActivity() {
         event.start = startTime
         event.end = endTime
 
-        Toast.makeText(this, "Menyinkronkan dengan Google Calendar...", Toast.LENGTH_SHORT).show()
+        val toastMessage = if (currentGoogleEventId.isNullOrEmpty()) "Menambahkan ke Google Calendar..."
+                           else "Memperbarui di Google Calendar..."
+        Toast.makeText(this, toastMessage, Toast.LENGTH_SHORT).show()
+
 
         // Jalankan di background
         CoroutineScope(Dispatchers.IO).launch {

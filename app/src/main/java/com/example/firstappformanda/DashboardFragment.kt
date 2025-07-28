@@ -12,6 +12,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.Scope
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.http.javanet.NetHttpTransport
@@ -39,6 +42,7 @@ class DashboardFragment : Fragment() {
     // --- Deklarasi Variabel ---
     private lateinit var firestore: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
+    private lateinit var googleSignInClient: GoogleSignInClient // <-- BARU
 
     // UI Kartu Detail Hubungan
     private lateinit var tvCoupleNames: TextView
@@ -81,12 +85,14 @@ class DashboardFragment : Fragment() {
         initializeFirebase()
         initializeViews(view)
         setupAdapters()
+        configureGoogleSignIn() // <-- Panggil konfigurasi
     }
 
     override fun onResume() {
         super.onResume()
         // Muat ulang data setiap kali fragment ini kembali terlihat
         loadAllDashboardData()
+
     }
 
     private fun initializeFirebase() {
@@ -122,6 +128,15 @@ class DashboardFragment : Fragment() {
         partnerAgendaAdapter = AgendaAdapter(partnerAgendaList)
         rvPartnerAgenda.layoutManager = LinearLayoutManager(requireContext())
         rvPartnerAgenda.adapter = partnerAgendaAdapter
+    }
+
+    private fun configureGoogleSignIn() {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestEmail()
+            .requestIdToken(getString(R.string.default_web_client_id))
+            .requestScopes(Scope(CalendarScopes.CALENDAR_EVENTS))
+            .build()
+        googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
     }
 
     private fun loadAllDashboardData() {
@@ -172,20 +187,25 @@ class DashboardFragment : Fragment() {
     }
 
     private fun loadUserAgenda(userId: String, list: MutableList<AgendaItem>, adapter: AgendaAdapter, progressBar: ProgressBar, emptyView: TextView, fetchFromGoogle: Boolean) {
+        Log.d(TAG, "loadUserAgenda called for userId: $userId, fetchFromGoogle: $fetchFromGoogle")
         progressBar.visibility = View.VISIBLE
         emptyView.visibility = View.GONE
 
         val googleEvents = mutableListOf<AgendaItem>()
         val firestoreActivities = mutableListOf<AgendaItem>()
         var googleDone = !fetchFromGoogle
+        if (googleDone) Log.d(TAG, "Skipping Google Calendar fetch for $userId")
         var firestoreDone = false
 
         fun mergeAndDisplay() {
             if (googleDone && firestoreDone) {
+                Log.d(TAG, "Both Google ($googleDone) and Firestore ($firestoreDone) data loaded for $userId. Merging.")
                 list.clear()
                 list.addAll(googleEvents)
                 list.addAll(firestoreActivities)
                 list.sortBy { it.timestamp }
+                Log.d(TAG, "Merged list for $userId: ${list.joinToString { it.title }}")
+
                 adapter.notifyDataSetChanged()
                 progressBar.visibility = View.GONE
                 emptyView.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
@@ -193,15 +213,20 @@ class DashboardFragment : Fragment() {
         }
 
         fetchFirestoreUnsyncedActivitiesForToday(userId) { activities ->
+            Log.d(TAG, "Firestore activities fetched for $userId: ${activities.size} items")
             firestoreActivities.addAll(activities)
             firestoreDone = true
+            Log.d(TAG, "Firestore data fetch complete for $userId. Trying to merge.")
             mergeAndDisplay()
         }
 
         if (fetchFromGoogle) {
+            Log.d(TAG, "Starting Google Calendar fetch for $userId")
             fetchGoogleCalendarEventsForToday { events ->
+                Log.d(TAG, "Google Calendar events fetched for $userId: ${events.size} items")
                 googleEvents.addAll(events)
                 googleDone = true
+                Log.d(TAG, "Google Calendar data fetch complete for $userId. Trying to merge.")
                 mergeAndDisplay()
             }
         }
@@ -241,6 +266,7 @@ class DashboardFragment : Fragment() {
     }
 
     private fun fetchFirestoreUnsyncedActivitiesForToday(userId: String, onComplete: (List<AgendaItem>) -> Unit) {
+        Log.d(TAG, "fetchFirestoreUnsyncedActivitiesForToday for userId: $userId")
         val calendar = Calendar.getInstance()
         val startOfDay = calendar.apply { set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0) }.timeInMillis
         val endOfDay = calendar.apply { set(Calendar.HOUR_OF_DAY, 23); set(Calendar.MINUTE, 59); set(Calendar.SECOND, 59) }.timeInMillis
@@ -251,8 +277,10 @@ class DashboardFragment : Fragment() {
             .whereLessThanOrEqualTo("startTime", endOfDay)
             .get()
             .addOnSuccessListener { documents ->
+                Log.d(TAG, "Firestore activities query success for $userId. Found ${documents.size()} documents for today.")
                 val activities = documents.filter {
-                    it.getString("googleEventId").isNullOrEmpty()
+                    // Ambil semua aktivitas, baik yang sudah sinkron maupun belum.
+                    it.getString("googleEventId").isNullOrEmpty() || !it.getString("googleEventId").isNullOrEmpty() // <-- Perubahan di sini
                 }.map { doc ->
                     val activity = doc.toObject(ActivityModel::class.java)
                     val timeInfo = "${formatTimestamp(activity.startTime, "HH:mm")} - ${formatTimestamp(activity.endTime, "HH:mm")}"
@@ -263,23 +291,44 @@ class DashboardFragment : Fragment() {
                         type = activity.type ?: "task"
                     )
                 }
+                Log.d(TAG, "Processed Firestore activities for $userId: ${activities.size} items (synced and unsynced).")
                 onComplete(activities)
             }
-            .addOnFailureListener { onComplete(emptyList()) }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Error fetching Firestore activities for $userId", e)
+                onComplete(emptyList())
+            }
     }
 
+    // --- FUNGSI fetchGoogleCalendarEventsForToday() YANG DIPERBAIKI TOTAL ---
     private fun fetchGoogleCalendarEventsForToday(onComplete: (List<AgendaItem>) -> Unit) {
-        val account = GoogleSignIn.getLastSignedInAccount(requireContext())
-        if (account == null || !GoogleSignIn.hasPermissions(account, Scope(CalendarScopes.CALENDAR_EVENTS))) {
-            onComplete(emptyList()); return
-        }
-        val credential = GoogleAccountCredential.usingOAuth2(requireContext(), listOf(CalendarScopes.CALENDAR_EVENTS)).setSelectedAccount(account.account)
+        Log.d(TAG, "Attempting to fetch Google Calendar events...")
+
+        // (BARU) Gunakan silentSignIn untuk me-refresh akun dan izin
+        googleSignInClient.silentSignIn()
+            .addOnSuccessListener { account ->
+                Log.d(TAG, "Silent sign-in successful. Account has permissions.")
+                // Setelah berhasil di-refresh, baru kita panggil API
+                loadEventsFromApi(account, onComplete)
+            }
+            .addOnFailureListener {
+                // Gagal silent sign-in, berarti user belum login atau izin dicabut
+                Log.w(TAG, "Silent sign-in failed. Skipping Google Calendar fetch.", it)
+                onComplete(emptyList())
+            }
+    }
+
+    private fun loadEventsFromApi(account: GoogleSignInAccount, onComplete: (List<AgendaItem>) -> Unit) {
+        val credential = GoogleAccountCredential.usingOAuth2(requireContext(), listOf(CalendarScopes.CALENDAR_EVENTS))
+            .setSelectedAccount(account.account)
+
         val calendarService = com.google.api.services.calendar.Calendar.Builder(
             NetHttpTransport(), GsonFactory.getDefaultInstance(), credential
         ).setApplicationName(getString(R.string.app_name)).build()
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
+                // ... (Logika query ke API Google tetap sama persis)
                 val calendar = Calendar.getInstance()
                 val startOfDay = DateTime(calendar.apply { set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0) }.time)
                 val endOfDay = DateTime(calendar.apply { set(Calendar.HOUR_OF_DAY, 23); set(Calendar.MINUTE, 59) }.time)
@@ -289,7 +338,8 @@ class DashboardFragment : Fragment() {
                     .setOrderBy("startTime").setSingleEvents(true).execute()
 
                 val items = events.items?.mapNotNull { event ->
-                    val startTime = event.start?.dateTime?.value ?: event.start?.date?.value ?: return@mapNotNull null
+                    // ... (Logika mapping data tetap sama)
+                    val startTime = event.start?.dateTime?.value ?: event.start?.date?.value ?: 0L
                     AgendaItem(
                         timestamp = startTime,
                         title = event.summary?.replace("[FAFM]", "")?.trim() ?: "Tanpa Judul",
@@ -297,8 +347,10 @@ class DashboardFragment : Fragment() {
                         type = "event"
                     )
                 } ?: emptyList()
+
                 withContext(Dispatchers.Main) { onComplete(items) }
             } catch (e: Exception) {
+                Log.e(TAG, "Error during API call", e)
                 withContext(Dispatchers.Main) { onComplete(emptyList()) }
             }
         }
